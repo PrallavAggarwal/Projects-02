@@ -1,0 +1,3 @@
+# hope this content is visible to you on your browser.
+
+I am testing readFile method of node file system library.
