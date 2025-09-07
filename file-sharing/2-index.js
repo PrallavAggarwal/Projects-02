@@ -58,10 +58,11 @@ openDir();
 
 async function readDir() {
   try {
-    const file = await fs.readdir('./');
+    const file = await fs.readdir('./', { withFileTypes: true });
     console.log("readDir ::::::::::::::::::::::::::");
     console.log(file)
-    console.log(file[4])
+    console.log('buffer of ', file[4], ' : ', Buffer.from(file[4], 'utf8'))
+    console.log('buffer of ', file[5], ' : ', Buffer.from(file[5], 'utf8'));
     //for await (const dirent of dir) {
     //      let node = document.createElement('div')
     //      node.classname = 'subfolder'
@@ -75,3 +76,6 @@ async function readDir() {
   }
 }
 readDir();
+
+
+fs.readdir('./').then((file) => { console.log(file) })

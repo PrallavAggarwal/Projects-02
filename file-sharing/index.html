@@ -4,11 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>File Sharing</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
-    <button onclick="openDir()"><h1>Show Folders</h1></button>
+    <label for="fileName"><h1>Write file/folder name</h1></label>
+    <input type="text" name="fileName" id="fileName" value="">
+    <button onclick="sendInfo()"><h1>Show Folders</h1></button>
     <div id="folders">
       
     </div>
+    <script>
+
+
+
+    //send request to backend using axios.
+    async function sendInfo(){
+      try{
+        let fileName = document.getElementById("fileName").value;
+        console.log("fileName in sendInfo: ", fileName);
+
+        const res = await axios.get('http://localhost:3001/files',{
+          headers:{fileName:fileName,}
+        });
+        console.log("res.data: ",res.data);
+      }
+      catch(err){
+        console.log("error: ",err);
+      }
+    }
+    async function getInfo(path){
+      try{
+
+        //axios request :::::::::::::::::::::::::::::::::::::
+          const res = await axios.get(path ? (`http://localhost:3001/folder?path=${path}`) : (`http://localhost:3001/folder`));
+        
+        console.log(res.data);
+        console.log(res.data.paths[0]);
+
+        //creating elements :::::::::::::::::::::::::::::::::
+        let folders = res.data.paths;
+        folders.forEach(file => {
+          console.log("name: ",file.name)
+          console.log("file.isDirectory() : ", file.isDirectory);
+          let div = document.createElement('div');
+          let url = "http://localhost:3001/"+file.name;
+          div.innerHTML = file.isDirectory ? `<b id="directory" onclick=${getInfo(file.name)} > ${file.name}</b>` : `<a href=${url}>${file.name}</a>`
+          document.getElementById("folders").appendChild(div);
+          //creating link 
+        })
+      }
+      catch(err){
+        console.log("Error while getting info: ",err);
+      }
+    }
+    getInfo();
+    </script>
   </body>
 </html>

@@ -2,10 +2,13 @@ const express = require("express");
 
 const app = express();
 
-let port = 3000;
+let port = 3001;
 
 let fs = require("fs")
 
+app.use(express.json())
+
+app.use(express.static('public'));
 
 // fs.readFile('./sample.txt', 'utf8', (err, data) => {
 //   if (err) {
@@ -41,17 +44,52 @@ console.log("current directory:", __dirname);
 //   }
 // })
 
-let file = 'sample.txt';
+
+let folderArray = [];
+function sendPath(req, res, next) {
+  console.log("value of req.query: ", req.query);
+  let path = req.query.path ? req.query.path : '';
+  let url = path ? './public/' + path : './public';
+  fs.readdir(url, { encoding: 'utf8', withFileTypes: true }, (err, files) => {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      files.forEach(file => {
+        file.isDirectory = file.isDirectory()
+      });
+      console.log(files);
+      folderArray = files;
+    }
+  });
+  next();
+}
+console.log("value of folderArray:", folderArray);
+//let file = 'sample.txt';
+
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html')
+});
 
 app.get('/files', (req, res) => {
   //let path = req.query.path;
   // res.setHeader("Content-Type", "image/jpeg")
+
+  console.log("req.body :", req.headers);
+  let file = req.headers.filename;
+  console.log("file in /files :", file);
   res.sendFile(__dirname + '/public/' + file);
 })
 
-app.get('/', (req, res) => {
+app.get('/folder', sendPath, (req, res) => {
   console.log("Server running on PORT:", port);
-  res.send(`<h1> Prallav </h1>`);
+  console.log("value of folderArray:", folderArray);
+  res.json({
+    paths: folderArray,
+  });
 });
+
+app.get('/')
+
 
 app.listen(port);
