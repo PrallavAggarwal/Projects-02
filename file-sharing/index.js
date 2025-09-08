@@ -4,11 +4,16 @@ const app = express();
 
 let port = 3001;
 
-let fs = require("fs")
+let fs = require("fs/promises")
 
 app.use(express.json())
 
-app.use(express.static('public'));
+// console.log("process.argv : ", process.argv)
+
+//it is creating url for all files in public folder.
+app.use(express.static(__dirname))
+
+//Not a right way to use : app.use(express.static('public/*'));
 
 // fs.readFile('./sample.txt', 'utf8', (err, data) => {
 //   if (err) {
@@ -46,31 +51,44 @@ console.log("current directory:", __dirname);
 
 
 let folderArray = [];
-function sendPath(req, res, next) {
-  console.log("value of req.query: ", req.query);
+
+//sendPath will list all the file names in folderArray. 
+//And if path is sent then it will attach path at the end of ./public
+async function sendPath(req, res, next) {
+  console.log("Inside sendPath middleware : value of req.query: ", req.query);
   let path = req.query.path ? req.query.path : '';
-  let url = path ? './public/' + path : './public';
-  fs.readdir(url, { encoding: 'utf8', withFileTypes: true }, (err, files) => {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      files.forEach(file => {
-        file.isDirectory = file.isDirectory()
-      });
-      console.log(files);
-      folderArray = files;
-    }
-  });
-  next();
+  console.log("Inside sendPath middleware : value of path : ", path);
+  let url = path ? __dirname + '/' + path : __dirname;
+  console.log("Inside sendPath middleware : value of url : ", url);
+  try {
+    const files = await fs.readdir(url, { encoding: 'utf8', withFileTypes: true })
+    files.forEach(file => {
+      file.isDirectory = file.isDirectory()
+    });
+    console.log("value of files from sendPath: ", files);
+    folderArray = files;
+    next();
+  } catch (err) {
+    console.log(err);
+    res.json({
+      success: false,
+      message: "some error occured while rendering url.",
+      error: err
+    })
+  }
 }
-console.log("value of folderArray:", folderArray);
+
+//console.log("value of folderArray:", folderArray);
 //let file = 'sample.txt';
 
+//default route to display index.html 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html')
 });
 
+//this route meant to display file searched by user. But currently not working properly.
+//it is using sendFile.
+//Will check this later.
 app.get('/files', (req, res) => {
   //let path = req.query.path;
   // res.setHeader("Content-Type", "image/jpeg")
@@ -81,6 +99,7 @@ app.get('/files', (req, res) => {
   res.sendFile(__dirname + '/public/' + file);
 })
 
+//Now this route is displaying the all files in the folderArray.
 app.get('/folder', sendPath, (req, res) => {
   console.log("Server running on PORT:", port);
   console.log("value of folderArray:", folderArray);
@@ -89,7 +108,24 @@ app.get('/folder', sendPath, (req, res) => {
   });
 });
 
-app.get('/')
+app.get('/subFolder', sendPath, (req, res) => {
+  try {
+    console.log("value of folderArray Inside subfolder :", folderArray);
+    res.json({
+      success: true,
+      message: "DETAILS OF SUBFOLDER",
+      paths: folderArray,
+    });
+  }
+  catch (err) {
+    console.log("Error occured while searching subfolder : ", err)
+    res.json({
+      success: false,
+      message: "error occured while searching desired subfolder.",
+      error: err
+    })
+  }
+})
 
 
 app.listen(port);

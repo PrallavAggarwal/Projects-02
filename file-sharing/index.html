@@ -7,9 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
-    <label for="fileName"><h1>Write file/folder name</h1></label>
-    <input type="text" name="fileName" id="fileName" value="">
-    <button onclick="sendInfo()"><h1>Show Folders</h1></button>
+    <h1>Discover your files</h1>
     <div id="folders">
       
     </div>
@@ -32,23 +30,32 @@
         console.log("error: ",err);
       }
     }
-    async function getInfo(path){
-      try{
 
+
+    //it will fetch info from the given path .
+    let str='';
+    async function getInfo(path){
+      // path = path+str;
+      try{
+        console.log("very first value of path after getInfo called : ", path);
+        //path = path+str;
+        let url = path ? (`http://localhost:3001/folder?path=${path}`) : (`http://localhost:3001/folder`)
+
+        console.log("very first value of url inside getInfo : ", url);
         //axios request :::::::::::::::::::::::::::::::::::::
-          const res = await axios.get(path ? (`http://localhost:3001/folder?path=${path}`) : (`http://localhost:3001/folder`));
-        
-        console.log(res.data);
-        console.log(res.data.paths[0]);
+          const res = await axios.get(url);
+        console.log("after axios await :::::::::::::::::::") 
+        console.log('res.data after axios request from index.html : ',res.data);
+        console.log('res.data.paths[0] after axios request from index.html : ',res.data.paths[0]);
 
         //creating elements :::::::::::::::::::::::::::::::::
         let folders = res.data.paths;
         folders.forEach(file => {
-          console.log("name: ",file.name)
-          console.log("file.isDirectory() : ", file.isDirectory);
+          console.log("Inside index.html:  name: ",file.name)
+          console.log("Inside index.html: file.isDirectory() : ", file.isDirectory);
           let div = document.createElement('div');
-          let url = "http://localhost:3001/"+file.name;
-          div.innerHTML = file.isDirectory ? `<b id="directory" onclick=${getInfo(file.name)} > ${file.name}</b>` : `<a href=${url}>${file.name}</a>`
+          let url = path ? "http://localhost:3001/"+path+file.name : "http://localhost:3001/"+file.name;
+          div.innerHTML = file.isDirectory ? `<b class="directory" onclick="getSubFolder('${file.name}')" > ${file.name}</b>` : `<a href=${url}>${file.name}</a>`
           document.getElementById("folders").appendChild(div);
           //creating link 
         })
@@ -58,6 +65,29 @@
       }
     }
     getInfo();
+
+    //function to get sub folder information
+    async function getSubFolder(subFile){
+      try{
+      console.log("Value of subfile Inside getSubFolder: ", subFile);
+      let url = 'http://localhost:3001/subFolder?path='+subFile;
+      str = str+subFile+'/';// ''+subfolder= subfolder 
+        console.log("str: ",str);
+      //const res = await axios.get(url);
+     // console.log("res after axios call in getSubFolder : ", res);
+       getInfo(str); 
+      }
+      catch(error){
+        console.log("Error occured while calling subFolder in index.html : ", error);
+        res.json({
+          success:false,
+          message:"Error occured while calling subFolder in index.html : ",
+          error:error 
+        })
+      }
+    }
+
+
     </script>
   </body>
 </html>

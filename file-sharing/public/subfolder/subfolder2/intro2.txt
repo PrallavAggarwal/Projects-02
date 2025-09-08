@@ -1,0 +1,3 @@
+I am inside public/subfolder/subfolder2/intro2.txt
+
+Let's see if you catch me !!!!!!!!!!!!!!!!!
