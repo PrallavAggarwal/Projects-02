@@ -61,11 +61,14 @@ app.post('/blog/create', async (req, res) => {
     let tag = req.body.tag;
 
     //pass array of tags.
-    console.log("tags : ", tag)
-    let tagEntry = await tagModel.find();
-    let isTagPresent = false;
-    let isUser = false;
-    console.log('tagEntry : ', tagEntry)
+    console.log("tags from request body : ", tag)
+
+
+    //::::::::::Approach 1st to create tag entry::::::::::::::
+    // let tagEntry = await tagModel.find();
+    // let isTagPresent = false;
+    // let isUser = false;
+    // console.log('tagEntry : ', tagEntry)
     // tagEntry.forEach(obj => {
     //   if (tag.includes(obj.name)) {
     //     isTagPresent = true;
@@ -83,11 +86,8 @@ app.post('/blog/create', async (req, res) => {
     //
     // })
 
-    console.log(typeof tag)
-    console.log(typeof JSON.stringify(tag))
-    let a = new Array();
 
-
+    //creating blog entry first.
     let blogEntry = await blogModel.create({
       title,
       content,
@@ -95,54 +95,85 @@ app.post('/blog/create', async (req, res) => {
       createdAt: date,
       author: userId,
       tags: tag
-    })
+    });
+
+    console.log(":::::::::::::blog created:::::::::::::::::::\n", blogEntry);
+    console.log("::::::::::::::::::::::::::::::::::::::::::::::")
 
 
-    tag.forEach(async element => {
-      tagEntry.forEach(async obj => {
-        if (element == obj.name) {
-          //if tag name already in collection 
-          isTagPresent = true;
-          console.log('tag present ', obj.name)
-          if (obj.user.includes(userId)) {
-            isUser = true;
-            console.log('user present')
-          } else {
-            //if tag name not present in collection 
-            obj.user.push(userId);
-          }
-          obj.blog.push(blogEntry._id);
-          await obj.save();
-        }
-      })
-      //tagEntry ke loop se bahar
-      if (!isTagPresent) {
-        //if tag name not present in collection 
-        let newTag = new tagModel({
-          name: element,
+    //:::::::::::::Approach 2nd to create entry in tag::::::::::
+    // tag.forEach(async element => {
+    //   tagEntry.forEach(async obj => {
+    //     if (element == obj.name) {
+    //       //if tag name already in collection 
+    //       isTagPresent = true;
+    //       console.log('tag present ', obj.name)
+    //       if (obj.user.includes(userId)) {
+    //         isUser = true;
+    //         console.log('user present')
+    //       } else {
+    //         //if tag name not present in collection 
+    //         obj.user.push(userId);
+    //       }
+    //       obj.blog.push(blogEntry._id);
+    //       await obj.save();
+    //     }
+    //   })
+    //   //tagEntry ke loop se bahar
+    //   if (!isTagPresent) {
+    //     //if tag name not present in collection 
+    //     let newTag = new tagModel({
+    //       name: element,
+    //       user: [userId],
+    //       blog: [blogEntry._id]
+    //     })
+    //     await newTag.save();
+    //     // newTag.name = element;
+    //     // newTag.user.push(userId);
+    //   }
+    // });
+
+
+    //:::::::::::::Approach 3rd for updating tag schema ::::::::::::
+    //to decrease complexity due to loops and db calls.
+    tag.map(async (item) => {
+      let newTag = await tagModel.findOne({ name: item });
+      if (!newTag) {
+        newTag = new tagModel({
+          name: item,
           user: [userId],
           blog: [blogEntry._id]
         })
         await newTag.save();
-        // newTag.name = element;
-        // newTag.user.push(userId);
+      } else {
+        if (!newTag.user.includes(userId)) {
+          newTag.user.push(userId);
+        }
+        if (!newTag.blog.includes(blogEntry._id)) {
+          newTag.blog.push(blogEntry._id);
+        }
+        await newTag.save();
       }
-    });
+    })
 
 
-    //if tag is not present then create new entry 
-    //add : name, blogId, userId
 
+    console.log("tag at last : ", tag)
+
+    //::::::::Creating user entry in db:::::::::::
     let userEntry = await userModel.findOneAndUpdate({ _id: userId }, {
       $addToSet: { tags: { $each: tag } },
       $push: { blogs: blogEntry._id }
     }, { new: true })
 
     console.log("user entry : ", userEntry)
-    console.log("tagentry after push", tagEntry)
+    let tagEntry = await tagModel.find();
+    // console.log("tagentry after push", tagEntry)
 
     return res.status(200).json({
       message: "success",
+      blogEntry: blogEntry,
+      userEntry: userEntry,
       tagEntry: tagEntry
     })
 

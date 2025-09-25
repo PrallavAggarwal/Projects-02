@@ -50,12 +50,18 @@ blogRoute.post('/create', authmiddleware, async (req, res) => {
       title: z.string().min(8).max(50),
       content: z.string().min(8).max(1000),
       imageUrl: z.string().min(8).max(100),
-      tag: z.string().min(1).max(50)
+      //   tag: z.string().min(1).max(50)
     })
 
-    const parsedBody = requiredBody.safeParse({ title: title, content: content, imageUrl: imageUrl, tag: tag })
+    const parsedBody = requiredBody.safeParse({
+      title: title,
+      content: content,
+      imageUrl: imageUrl,
+      tag: tag
+    })
     if (!parsedBody.success) {
       let prettyError = z.prettifyError(parsedBody.error)
+
       console.log("error : ", prettyError)
 
       return res.status(400).json({
@@ -68,47 +74,63 @@ blogRoute.post('/create', authmiddleware, async (req, res) => {
 
     //entry in database 
 
-    let tagEntry = await tagModel.findOne({
-      name: tag
-    })
-    //if tag not present then create an new one.
-    //scope of optimization.
-    let flag = false;
-    if (!tagEntry) {
-      flag = true;
-      tagEntry = await tagModel.create({ name: tag });
-      tagEntry.user.push(userId);
-      await tagEntry.save();
-    }
-
-    //creating entry in blog. 
-    //with also saving tag in blog.
-    //scope for optimization in db call
-    let blog = await blogModel.create({
-      title: title,
-      content: content,
-      imageUrl: imageUrl,
-      author: userId,
+    //:::::::::::::::creating blog entry in db:::::::::::
+    let blogEntry = await blogModel.create({
+      title,
+      content,
+      imageUrl,
       createdAt: date,
-    })
-    blog.tags.push(tagEntry._id);
-    await blog.save();
+      author: userId,
+      tags: tag
+    });
 
-    //adding new blog id to corresponding tag. 
-    if (flag) {
-      await tagModel.findOneAndUpdate({ name: tag }, { $push: { blogs: blog._id } })
-    }
-    //adding blog entry to corresponding user
-    // let user = await userModel.findOneAndUpdate({ _id: userId }, { $push: { blogs: blog._id, tags: tagEntry._id } });
-    let user = await userModel.findById(userId).populate();
-    console.log('user: ', user)
+    console.log(":::::::::::::blog created:::::::::::::::::::\n", blogEntry);
+    console.log("::::::::::::::::::::::::::::::::::::::::::::::")
+
+
+    //:::::::::::::Approach 3rd for updating tag schema ::::::::::::
+    //to decrease complexity due to loops and db calls.
+    //:::::::::::::Creating tag entry in db:::::::::::::::
+    tag.map(async (item) => {
+      let newTag = await tagModel.findOne({ name: item });
+      if (!newTag) {
+        newTag = new tagModel({
+          name: item,
+          user: [userId],
+          blogs: [blogEntry._id]
+        })
+        await newTag.save();
+      } else {
+        if (!newTag.user.includes(userId)) {
+          newTag.user.push(userId);
+        }
+        if (!newTag.blogs.includes(blogEntry._id)) {
+          newTag.blogs.push(blogEntry._id);
+        }
+        await newTag.save();
+      }
+    })
+
+
+    console.log("tag at last : ", tag)
+
+    //::::::::Creating user entry in db:::::::::::
+    let userEntry = await userModel.findOneAndUpdate({ _id: userId }, {
+      $addToSet: { tags: { $each: tag } },
+      $push: { blogs: blogEntry._id }
+    }, { new: true })
+
+    console.log("user entry : ", userEntry)
+    let tagEntry = await tagModel.find();
+    // console.log("tagentry after push", tagEntry)
 
     return res.status(200).json({
-      success: true,
-      message: "blog created successfully.",
-      blog: blog,
-      user: user
+      message: "success",
+      blogEntry: blogEntry,
+      userEntry: userEntry,
+      tagEntry: tagEntry
     })
+
   }
   catch (error) {
     console.log("error while creating blog : ", error);
@@ -126,8 +148,30 @@ blogRoute.post('/create', authmiddleware, async (req, res) => {
 blogRoute.get('/blogs', authmiddleware, async (req, res) => {
   try {
     let userId = req.userId;
-    let tags = await tagModel.find().where('user').in([userId]);
+    let tags = await tagModel.find().where('user').in([userId]).populate('blogs');
     console.log('tags : ', tags);
+
+    let displayBlogList = [];
+    let uniqueBlogEntry = new Map();
+    tags.map((item) => {
+      //storing blogs only it lenght is not zero.
+
+      if (item.blogs.length != 0) {
+        //console.log(item.blogs);
+        //pushing only unique blogs from array of blogs from each tag.
+
+        item.blogs.forEach(blog => {
+          console.log("id : ", JSON.stringify(blog._id));
+          let id = JSON.stringify(blog._id);
+          if (!uniqueBlogEntry.has(id)) {
+            uniqueBlogEntry.set(id, blog);
+            displayBlogList.push(blog);
+
+          }
+        })
+      }
+    });
+    console.log("display blog list : ", displayBlogList)
     return res.status(200).json({
       success: true,
       message: "blog will be displayed soon.",
@@ -135,9 +179,11 @@ blogRoute.get('/blogs', authmiddleware, async (req, res) => {
     })
 
   } catch (error) {
+    console.log("error while displaying blogs : ", error)
     return res.status(500).json({
       success: false,
-      message: "can not show blogs."
+      message: "can not show blogs in blogs route.",
+      error: error
     })
   }
 })

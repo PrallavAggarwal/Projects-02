@@ -12,7 +12,7 @@ const blog = new Schema({
   title: String,
   content: String,
   imageUrl: String,
-  tags: [{ type: String, unique: true }],
+  tags: [String],
   createdAt: Date,
   author: {
     type: ObjectId,
@@ -32,7 +32,7 @@ const user = new Schema({
   collection: [{ type: ObjectId, ref: 'blog' }],
   favourites: [{ type: ObjectId, ref: 'blog' }],
   blogs: [{ type: ObjectId, ref: 'blog' }],
-  tags: [{ type: ObjectId, ref: 'tag' }],
+  tags: [String],
   liked: [{ type: ObjectId, ref: 'blog' }],
 })
 
