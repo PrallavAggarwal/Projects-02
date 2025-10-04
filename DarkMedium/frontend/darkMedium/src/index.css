@@ -1,1 +1,8 @@
-@import 'tailwindcss'
+@import 'tailwindcss';
+
+
+@theme{
+  --color-stroke: #A5A5A5;
+  --color-background: #282828;
+  --color-fontColor: #ffffff;
+}
