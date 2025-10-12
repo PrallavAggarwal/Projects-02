@@ -14,12 +14,12 @@ const { success } = require("zod");
 async function authmiddleware(req, res, next) {
   try {
     console.log(req.headers);
-    let token = req.headers['set-cookie'];
-    console.log("value of token fetched from req.:\n", token[0]);
-    let token2 = token[0];
-    console.log(typeof token2)
-    console.log(token2[0])
-    let decodedData = jwt.verify(token2, JWT_SECRET_KEY);
+    let token = req.headers.token;
+    console.log("value of token fetched from req.:\n", token);
+    // let token2 = token[0];
+    // console.log(typeof token2)
+    // console.log(token2[0])
+    let decodedData = jwt.verify(token, JWT_SECRET_KEY);
     console.log("value of decodedData : \n", decodedData);
     let userid = decodedData['userid'];
 

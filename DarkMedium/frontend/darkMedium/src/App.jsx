@@ -1,15 +1,30 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import './App.css'
 import { Intro } from './pages/intro'
 import { Home } from './pages/home'
+import { Route, Routes } from 'react-router-dom'
+import { SignUp } from './pages/signup'
+import { Login } from './pages/login'
+import { CreateBlog } from './pages/createBlog'
+import { AppContext } from './AppContext'
+import { ProfileHome } from './pages/profileHome'
 
 function App() {
-  const [count, setCount] = useState(0)
+
 
   return (
     <div className='bg-[#282828] w-screen h-screen text-white m-0'>
 
-      <Home />
+
+      <Routes>
+        <Route path='/' element={<Intro />} />
+        <Route path='/home' element={<Home />} />
+        <Route path='/signup' element={<SignUp />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/createBlog' element={<CreateBlog />} />
+        <Route path='/profile' element={<ProfileHome />} />
+      </Routes>
+
     </div>
   )
 }

@@ -1,8 +1,13 @@
-@import 'tailwindcss';
+/* importing fonts via google fonts */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
+/* import tailwindcss */
+@import 'tailwindcss';
 
 @theme{
   --color-stroke: #A5A5A5;
   --color-background: #282828;
   --color-fontColor: #ffffff;
+  --font-FiraMono: "Fira Mono", monospace;
+  --font-PlayFairDisplay: "Playfair Display", serif;
 }

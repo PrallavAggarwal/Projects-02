@@ -49,6 +49,7 @@ userRouter.post('/signup', async (req, res) => {
         success: false,
         route: "sign-up",
         message: prettyError,
+        password: password
       })
     }
     //now at this point we have input with correct format.
@@ -188,7 +189,7 @@ userRouter.post('/signout', (req, res) => {
   try {
 
     //reset cookie with null
-    res.setHeader('Set-Cookie', '');
+    res.setHeader('token', '');
     console.log("cookie set to null.");
     return res.status(200).json({
       success: true,

@@ -11,7 +11,7 @@
 const { Router } = require('express');
 const blogRoute = Router();
 const { blogModel, tagModel, userModel } = require('../db/models.js')
-const { z } = require('zod');
+const { z, success } = require('zod');
 const authmiddleware = require('../middlewares/auth.js')
 
 blogRoute.post('/create', authmiddleware, async (req, res) => {
@@ -48,8 +48,8 @@ blogRoute.post('/create', authmiddleware, async (req, res) => {
 
     const requiredBody = z.object({
       title: z.string().min(8).max(50),
-      content: z.string().min(8).max(1000),
-      imageUrl: z.string().min(8).max(100),
+      content: z.string().min(8).max(10000),
+      imageUrl: z.string().min(8).max(1000),
       //   tag: z.string().min(1).max(50)
     })
 
@@ -57,7 +57,7 @@ blogRoute.post('/create', authmiddleware, async (req, res) => {
       title: title,
       content: content,
       imageUrl: imageUrl,
-      tag: tag
+      //     tag: tag
     })
     if (!parsedBody.success) {
       let prettyError = z.prettifyError(parsedBody.error)
@@ -125,7 +125,8 @@ blogRoute.post('/create', authmiddleware, async (req, res) => {
     // console.log("tagentry after push", tagEntry)
 
     return res.status(200).json({
-      message: "success",
+      success: true,
+      message: "blog created successfully",
       blogEntry: blogEntry,
       userEntry: userEntry,
       tagEntry: tagEntry
@@ -175,7 +176,8 @@ blogRoute.get('/blogs', authmiddleware, async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "blog will be displayed soon.",
-      tag: tags
+      tag: tags,
+      blogs: displayBlogList
     })
 
   } catch (error) {
@@ -183,6 +185,107 @@ blogRoute.get('/blogs', authmiddleware, async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "can not show blogs in blogs route.",
+      error: error
+    })
+  }
+})
+
+blogRoute.get('/allBlogs', async (req, res) => {
+  try {
+    let blogs = await blogModel.find({});
+    return res.status(200).json({
+      blogs: blogs
+    })
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      error: error,
+      message: 'some error occured while getting all blogs.'
+    })
+  }
+})
+
+
+blogRoute.get('/userBlogs', authmiddleware, async (req, res) => {
+  try {
+    let userId = req.userId;
+    let blogs = await userModel.findById(userId).populate('blogs');
+    if (blogs.length == 0) {
+      console.log('user has no blogs');
+      return res.status(400).json({
+        success: false,
+        message: "User has no blogs yet.",
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "blogs for user fetched.",
+      blogs: blogs
+    })
+  } catch (error) {
+    console.log('error occured while fetching blogs for user.', error);
+    return res.status(500).json({
+      success: false,
+      message: "error occured while fetching blogs for user.",
+      error: error
+    })
+  }
+})
+
+
+blogRoute.delete('/delete', async (req, res) => {
+
+
+  try {
+    //delete blog from 
+    //1. user
+    //2. tag
+    //3. blog
+
+    let blogId = req.query.blogId;
+    let userId = req.query.userId;
+    console.log(blogId)
+    console.log(typeof blogId)
+
+    // Step 1: Remove blog reference from ALL users' 'blogs' arrays
+    const userUpdateResult = await userModel.findOneAndUpdate(
+      { _id: userId, blogs: blogId }, // Filter: documents where blogs array contains blogId
+      { $pull: { blogs: blogId } },// Pull the blogId from the array
+      { new: true }
+    );
+    console.log('Updated users : ', userUpdateResult); // { modifiedCount: X, ... }
+
+    // Step 2: Remove blog reference from ALL tags' 'blog' arrays (note: field is 'blog', not 'blogs')
+    const tagUpdateResult = await tagModel.findOneAndUpdate(
+      { blogs: blogId }, // Filter: documents where blog array contains blogId
+      { $pull: { blogs: blogId } }, // Pull the blogId from the array
+      { new: true }
+    );
+    console.log('Updated blog from tags : ', tagUpdateResult); // { modifiedCount: X, ... }
+
+    // Step 3: Delete the blog document itself
+    const blogDeleteResult = await blogModel.deleteOne({ _id: blogId });
+    console.log('Deleted blog document : ', blogDeleteResult); // { deletedCount: 1 } if successful
+
+    if (blogDeleteResult.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: 'Blog not found' });
+    }
+
+    const blogUpdateResult = await blogModel.findOneAndDelete({ _id: blogId }, { new: true });
+    console.log('Updated blogs : ', blogUpdateResult)
+
+    return res.status(200).json({
+      success: true,
+      message: 'Blog deleted successfully',
+      user: userUpdateResult
+    });
+
+  } catch (error) {
+    console.log('error while deleting blog : ', error);
+    return res.status(500).json({
+      success: false,
+      message: 'blog not deleted.',
       error: error
     })
   }
