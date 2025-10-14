@@ -1,14 +1,15 @@
 import { useContext, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../AppContext";
-
+import { signupHandler } from "../requests/apiRequests";
+import { useMutation } from "@tanstack/react-query";
 
 
 export function SignUp() {
 
   const navigate = useNavigate()
 
-  const { isLoggedIn, setLoggedIn } = useContext(AppContext);
+  const { user, setUser, isLoggedIn, setLoggedIn } = useContext(AppContext);
 
   const [active, setActive] = useState(false);
   function activeHandler(event) {
@@ -45,47 +46,49 @@ export function SignUp() {
 
   }
 
-  async function submitHandler() {
-    try {
-      let input = {
-        email: emailRef.current,
-        username: usernameRef.current,
-        password: passwordRef.current
-      }
-      console.log(input)
-      let url = 'http://localhost:3003/api/v1/user/signup';
-      let res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(input)
+  const { mutate } = useMutation({
+    mutationFn: (input_data) => signupHandler(input_data),
+    onSuccess: (data) => {
+      setLoggedIn(true);
+      console.log('isLoggedIn value after : ', isLoggedIn)
+      setUser({
+        username: data.user.username,
+        email: data.user.email,
+        id: data.user._id,
+        blogs: data.user.blogs,
+        collection: data.user.collection,
+        favourites: data.user.favourites,
+        liked: data.user.liked,
+        tags: data.user.tags,
+        token: data.token
       })
-
-      let data = await res.json();
-      console.log('response from server \n', data)
-      console.log(data.success)
-      if (data.success) {
-        console.log('isLoggedIn value before : ', isLoggedIn);
-        setLoggedIn((prev) => !prev);
-        console.log('isLoggedIn value after : ', isLoggedIn)
-      }
-
-
-    } catch (error) {
-      console.log('error while signup : ', error)
+      navigate('/home')
+      alert('signup success')
+    },
+    onError: (error) => {
+      console.log("error while signup : ", error)
     }
+  })
+
+  function submitHandler() {
+    let input_data = {
+      email: emailRef.current,
+      username: usernameRef.current,
+      password: passwordRef.current
+    }
+    mutate(input_data);
   }
 
+
   return (
-    <div id="parent" className={`${active ? 'hidden' : ''} w-screen h-screen bg-white/30 drop-shadow-2xl backdrop-blur-lg flex items-center justify-center absolute top-0 left-0 z-10`} onClick={activeHandler}>
+    <div id="parent" className={`${active ? 'hidden' : ''} w-screen h-screen bg-white/30 drop-shadow-2xl backdrop-blur-lg flex items-center justify-center absolute top-0 left-0 z-10 font-FiraMono`} onClick={activeHandler}>
       <div onClick={activeHandler} id="child" className="grid grid-cols-2 w-1/2 h-1/2">
         <div className="bg-background flex justify-center items-center text-4xl">SignUp</div>
         <div className="flex flex-col items-center justify-between bg-stroke">
           <div className=" h-full w-full flex justify-center items-center p-3"><input name="email" type="email" onChange={changeHandler} placeholder="email" className="bg-[#d9d9d9] p-7 text-black w-full text-2xl" /></div>
           <div className=" h-full w-full flex justify-center items-center p-3"><input name="username" type="text" onChange={changeHandler} placeholder="username" className="bg-[#d9d9d9] p-7 text-black w-full text-2xl" /></div>
           <div className=" h-full w-full flex justify-center items-center p-3"><input name="password" type="password" onChange={changeHandler} placeholder="password" className="bg-[#d9d9d9] p-7 text-black w-full text-2xl" /></div>
-          <div className=" h-full w-full flex justify-center items-center p-3"><div className="bg-[#d9d9d9] p-7 text-center text-gray-600 font-bold w-full text-3xl hover:cursor-pointer hover:bg-stroke hover:border border-white" onClick={submitHandler}>Submit</div></div>
+          <div className=" h-full w-full flex justify-center items-center p-3"><div className="bg-[#d9d9d9] p-7 text-center text-gray-600 font-bold w-full text-3xl hover:cursor-pointer hover:bg-stroke hover:inset-ring-2 hover:text-white transition-all ease-in-out  border-white" onClick={submitHandler}>Submit</div></div>
         </div>
       </div>
     </div >

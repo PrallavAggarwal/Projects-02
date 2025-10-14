@@ -1,36 +1,37 @@
 import { useContext } from "react";
 import { AppContext } from "../AppContext";
 import { useNavigate } from "react-router-dom";
+import { deleteHandler } from "../requests/apiRequests";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryOptionsFetchUserBlogs } from "../generalOptions/queries";
 
 
-export function SingleBlog({ title, profile, content, imageUrl, blogId }) {
+export function SingleBlog({ setBlogs, title, profile, content, imageUrl, blogId }) {
 
-  const { user, setUser, setDeleted } = useContext(AppContext)
-  const navigate = useNavigate()
+  const { user } = useContext(AppContext)
+  console.log('value of user in singleBlog : ', user)
 
-  async function deleteHandler() {
-    try {
-      let url = 'http://localhost:3003/api/v1/blog/delete?blogId=' + blogId + '&userId=' + user.id;
-      console.log('url : ', url)
-      let res = await fetch(url, {
-        method: "DELETE",
+  const queryClient = useQueryClient()
+
+  const { mutate } = useMutation({
+    mutationFn: (blogId_user) => deleteHandler(blogId_user),
+    onSuccess: (data, variable, context) => {
+      queryClient.invalidateQueries({
+        queryKey: queryOptionsFetchUserBlogs(user.token).queryKey
       })
-      let data = await res.json();
-      console.log('data from deleted blogs : ', data)
-      if (data.success) {
-        let newBlogs = data.user.blogs;
-        let newCollections = data.user.collection;
-        let newFavourites = data.user.favourites;
-        let newLiked = data.user.liked;
-        setUser({ ...user, blogs: newBlogs, collection: newCollections, favourites: newFavourites, liked: newLiked })
-        setDeleted((prev) => !prev)
-        alert('blog deleted.')
-      }
-    } catch (error) {
-      console.log('blog not deleted some error occured : ', error)
+    },
+    onError: (error) => {
+      console.log("error while deleting : ", error)
     }
-  }
+  })
 
+  function clickHandler() {
+    let blogId_user = {
+      blogId: blogId,
+      user: user
+    }
+    mutate(blogId_user)
+  }
 
   return (
     <div className="font-FiraMono border-t border-b border-stroke h-1/2">
@@ -48,7 +49,7 @@ export function SingleBlog({ title, profile, content, imageUrl, blogId }) {
           <div className="h-full w-full border-r border-stroke flex items-center justify-center">Likes</div>
           <div className="h-full w-full border-r border-stroke flex items-center justify-center">Response</div>
           <div className="h-full w-full flex border-r border-stroke items-center justify-center">Save</div>
-          {profile && <div className="h-full w-full flex items-center justify-center" onClick={deleteHandler}>Delete</div>}
+          {profile && <div className="h-full w-full flex items-center justify-center" onClick={clickHandler}>Delete</div>}
         </div>
       </div>
     </div>

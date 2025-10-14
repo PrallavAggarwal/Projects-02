@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { CreateBlog } from "../pages/createBlog";
 import { SingleBlog } from "./singleBlog";
-import { useEffect, useState } from "react";
-
+import { useContext, useEffect, useState } from "react";
+import { AppContext } from "../AppContext";
+import { useQuery } from "@tanstack/react-query";
+import { queryOptionsFetchAllBlogs } from "../generalOptions/queries";
+import { fetchAllBlogs } from "../requests/apiRequests";
 
 export function MainFrame() {
 
@@ -11,22 +14,12 @@ export function MainFrame() {
     navigate('/createBlog')
   }
 
-  const [blog, setBlogs] = useState([])
 
-  useEffect(() => {
-    async function fetchBlog() {
-      try {
-        let res = await fetch('http://localhost:3003/api/v1/blog/allBlogs')
-        let data = await res.json();
-        console.log('blogs : ', data.blogs)
-        setBlogs(() => data.blogs)
-      } catch (error) {
-        console.log('some error occured while fetching blogs.')
+  const { data, isLoading, isError, isSuccess } = useQuery(queryOptionsFetchAllBlogs())
 
-      }
-    }
-    fetchBlog()
-  }, [])
+
+  //fetchAllBlogs returning promises so it is async hence first data is undefined
+  console.log("blogs for mainframe : ", data)
 
   return (
     <div className="overflow-y-auto font-FiraMono border-r w-full h-full
@@ -43,8 +36,12 @@ export function MainFrame() {
 
       <div className="flex flex-col gap-5">
 
-        {
-          blog.map((item) => {
+
+        {isLoading && <div>Loading....</div>}
+
+        {isError && <div>Error....</div>}
+        {isSuccess &&
+          data.map((item) => {
             let title = item.title;
             let imageUrl = item.imageUrl;
             let content = item.content;

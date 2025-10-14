@@ -1,33 +1,50 @@
 import { useState, useEffect, useContext } from "react";
 import { AppContext } from "../AppContext";
 import { SingleBlog } from "../components/singleBlog";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryOptionsFetchUserBlogs } from "../generalOptions/queries";
 
 
 export function Profile() {
 
-  const [blog, setBlogs] = useState([])
   const { user } = useContext(AppContext)
+  const token = user.token;
+  console.log('token of user : ', token)
 
-  useEffect(() => {
-    async function fetchBlog() {
-      try {
-        let res = await fetch('http://localhost:3003/api/v1/blog/userBlogs', {
-          method: "GET",
-          headers: {
-            'token': user.token
-          }
-        })
-        let data = await res.json();
-        console.log('data from fetched blogs for user \n', data)
-        console.log('blogs : ', data.blogs)
-        setBlogs(() => data.blogs.blogs)
-      } catch (error) {
-        console.log('some error occured while fetching blogs.')
+  const { data, isLoading, isSuccess, isError } = useQuery(queryOptionsFetchUserBlogs(token));
 
-      }
-    }
-    fetchBlog()
-  }, [])
+  console.log('from profile : ', data)
+
+  // useEffect(() => {
+  //
+  //   let ignore = false;
+  //
+  //   async function fetchBlog() {
+  //     try {
+  //       let res = await fetch('http://localhost:3003/api/v1/blog/userBlogs', {
+  //         method: "GET",
+  //         headers: {
+  //           'token': user.token
+  //         }
+  //       })
+  //       let data = await res.json();
+  //       console.log('data from fetched blogs for user \n', data)
+  //       console.log('blogs : ', data.blogs)
+  //       if (!ignore) {
+  //         setBlogs(data.blogs.blogs)
+  //       }
+  //     } catch (error) {
+  //       console.log('some error occured while fetching blogs.')
+  //
+  //     }
+  //   }
+  //   fetchBlog()
+  //
+  //   return () => {
+  //     ignore = true;
+  //   }
+  //
+  // }, [blog])
 
 
   return (
@@ -43,9 +60,11 @@ export function Profile() {
         <div className="pt-4 py-2 px-5 h-full border-r border-stroke">Account</div>
       </div>
 
+      {isLoading && <div>Loading...</div>}
+      {isError && <div>Error...</div>}
 
-      {
-        blog.map((item) => {
+      {isSuccess &&
+        data.map((item) => {
           let title = item.title;
           let imageUrl = item.imageUrl;
           let content = item.content;

@@ -7,34 +7,15 @@ import { Login } from "./login";
 import { SignUp } from "./signup";
 import { AppContext } from "../AppContext";
 
-
 export function Home() {
 
   const { isLoggedIn, user } = useContext(AppContext)
   console.log('inside home value of isLoggedIn : ', isLoggedIn)
-  console.log('user in home : ',)
+  console.log('user in home : ', user)
 
-  async function fetchBlogs() {
-    try {
-      let url = 'http://localhost:3003/api/v1/blog/allBlogs'
-      let res = await fetch(url);
-      let data = await res.json();
-      console.log('data of all blogs : ', data);
-
-    } catch (error) {
-      console.log('error while fetching blogs : ', error)
-    }
-  }
-
-  if (isLoggedIn) {
-    fetchBlogs();
-  }
 
   return (
     <div className="w-screen h-screen overflow-hidden relative">
-      {/* <Login /> */}
-      {/* <SignUp /> */}
-
 
       {
         isLoggedIn &&
@@ -45,10 +26,7 @@ export function Home() {
             <MainFrame />
             <Tags />
           </div>
-
-
         </div>
-
       }
       {
         !isLoggedIn &&

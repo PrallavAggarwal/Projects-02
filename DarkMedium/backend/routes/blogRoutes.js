@@ -253,7 +253,7 @@ blogRoute.delete('/delete', async (req, res) => {
       { _id: userId, blogs: blogId }, // Filter: documents where blogs array contains blogId
       { $pull: { blogs: blogId } },// Pull the blogId from the array
       { new: true }
-    );
+    ).populate('blogs');
     console.log('Updated users : ', userUpdateResult); // { modifiedCount: X, ... }
 
     // Step 2: Remove blog reference from ALL tags' 'blog' arrays (note: field is 'blog', not 'blogs')

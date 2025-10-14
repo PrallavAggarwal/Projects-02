@@ -85,7 +85,8 @@ userRouter.post('/signup', async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Sign-up success",
-      user: user
+      user: user,
+      token: token
     })
 
 
