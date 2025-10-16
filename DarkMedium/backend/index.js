@@ -13,6 +13,7 @@ const { default: mongoose } = require('mongoose');
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }))
 
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/blog', blogRoute);

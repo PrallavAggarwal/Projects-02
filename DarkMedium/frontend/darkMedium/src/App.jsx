@@ -8,15 +8,18 @@ import { Login } from './pages/login'
 import { CreateBlog } from './pages/createBlog'
 import { AppContext } from './AppContext'
 import { ProfileHome } from './pages/profileHome'
+import { UploadImage } from './components/uploadImage'
 
 function App() {
 
 
   return (
-    <div className='bg-[#282828] w-screen h-screen text-white m-0'>
+    <div className='bg-[#282828] w-screen h-screen text-white'>
+
 
 
       <Routes>
+        <Route path='/uploadImage' element={<UploadImage />} />
         <Route path='/' element={<Intro />} />
         <Route path='/home' element={<Home />} />
         <Route path='/signup' element={<SignUp />} />

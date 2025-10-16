@@ -81,14 +81,14 @@ export function SignUp() {
 
 
   return (
-    <div id="parent" className={`${active ? 'hidden' : ''} w-screen h-screen bg-white/30 drop-shadow-2xl backdrop-blur-lg flex items-center justify-center absolute top-0 left-0 z-10 font-FiraMono`} onClick={activeHandler}>
-      <div onClick={activeHandler} id="child" className="grid grid-cols-2 w-1/2 h-1/2">
-        <div className="bg-background flex justify-center items-center text-4xl">SignUp</div>
-        <div className="flex flex-col items-center justify-between bg-stroke">
-          <div className=" h-full w-full flex justify-center items-center p-3"><input name="email" type="email" onChange={changeHandler} placeholder="email" className="bg-[#d9d9d9] p-7 text-black w-full text-2xl" /></div>
-          <div className=" h-full w-full flex justify-center items-center p-3"><input name="username" type="text" onChange={changeHandler} placeholder="username" className="bg-[#d9d9d9] p-7 text-black w-full text-2xl" /></div>
-          <div className=" h-full w-full flex justify-center items-center p-3"><input name="password" type="password" onChange={changeHandler} placeholder="password" className="bg-[#d9d9d9] p-7 text-black w-full text-2xl" /></div>
-          <div className=" h-full w-full flex justify-center items-center p-3"><div className="bg-[#d9d9d9] p-7 text-center text-gray-600 font-bold w-full text-3xl hover:cursor-pointer hover:bg-stroke hover:inset-ring-2 hover:text-white transition-all ease-in-out  border-white" onClick={submitHandler}>Submit</div></div>
+    <div id="parent" className={`${active ? 'hidden' : ''} w-screen h-screen bg-background drop-shadow-2xl backdrop-blur-lg flex items-center justify-center absolute top-0 left-0 z-10 font-FiraMono`} onClick={activeHandler}>
+      <div onClick={activeHandler} id="child" className="font-FiraMono flex flex-col lg:grid lg:grid-cols-[1fr_2fr] w-1/2 h-1/2">
+        <div className="bg-background flex justify-center items-center text-2xl md:text-4xl border-b-2 pb-2 lg:border-2 m-1.5">SignUp</div>
+        <div className="flex flex-col items-center justify-between bg-stroke border-2 m-1.5">
+          <div className=" h-full w-full flex justify-center items-center drop-shadow-2xl p-3"><input name="email" type="email" onChange={changeHandler} placeholder="email" className="bg-[#d9d9d9] p-7 text-black w-full text-2xl" /></div>
+          <div className=" h-full w-full flex justify-center items-center p-3 drop-shadow-2xl "><input name="username" type="text" onChange={changeHandler} placeholder="username" className="bg-[#d9d9d9] p-7 text-black w-full text-2xl" /></div>
+          <div className=" h-full w-full flex justify-center items-center p-3 drop-shadow-2xl "><input name="password" type="password" onChange={changeHandler} placeholder="password" className="bg-[#d9d9d9] p-7 text-black w-full text-2xl" /></div>
+          <div className=" h-full w-full flex justify-center items-center p-3 drop-shadow-2xl "><div className="bg-[#d9d9d9] p-7 text-center text-gray-600 font-bold w-full text-2xl md:text-3xl hover:cursor-pointer hover:bg-stroke hover:inset-ring-2 hover:text-white transition-all ease-in-out  border-white" onClick={submitHandler}>Submit</div></div>
         </div>
       </div>
     </div >

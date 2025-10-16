@@ -28,8 +28,8 @@ export function MainFrame() {
   [&::-webkit-scrollbar-thumb]:bg-gray-300
   dark:[&::-webkit-scrollbar-track]:bg-neutral-700
   dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-      <div className="flex w-full border-b border-stroke">
-        <div className="pt-4 py-2 px-5 h-full border-r border-stroke">For You</div>
+      <div className="flex justify-center sm:justify-start w-full border-b border-stroke">
+        <div className=" border-l-1 sm:border-l-0 pt-4 py-2 px-5 h-full border-r border-stroke">For You</div>
         <div className="pt-4 py-2 px-5 h-full border-r border-stroke">Explore</div>
         <div onClick={createHandler} className="pt-4 py-2 px-5 h-full border-r border-stroke">Create</div>
       </div>

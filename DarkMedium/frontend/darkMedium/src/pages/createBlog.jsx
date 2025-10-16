@@ -1,7 +1,7 @@
 import { useContext, useRef, useState } from "react"
 import { AppContext } from "../AppContext";
 import { useNavigate } from "react-router-dom";
-
+import { UploadImage } from "../components/uploadImage";
 
 
 export function CreateBlog() {
@@ -10,9 +10,10 @@ export function CreateBlog() {
   const imageRef = useRef('');
   const contentRef = useRef('');
 
-  const { user } = useContext(AppContext);
+  const { user, formData, setFormData } = useContext(AppContext);
   const navigate = useNavigate()
 
+  console.log('value of formData : ', formData);
   async function submitHandler() {
     try {
       let tagArray = [];
@@ -21,6 +22,20 @@ export function CreateBlog() {
           tagArray.push(key)
         }
       }
+
+      let title = titleRef.current;
+      let content = contentRef.current;
+      let newFormData = new FormData();
+      newFormData.append('title', title);
+      newFormData.append('content', content);
+      newFormData.append('userId', user.id);
+      newFormData.append('tag', JSON.stringify(tagArray));
+      newFormData.append('uploadImage', formData);
+      for (var pair of newFormData.entries()) {
+        console.log(`${pair[0]}: ${pair[1]}`);
+      }
+      console.log('new form data in create blog : ', newFormData.uploadImage)
+      console.log('formdata : ', newFormData.files)
       let input = {
         title: titleRef.current,
         imageUrl: imageRef.current,
@@ -34,11 +49,10 @@ export function CreateBlog() {
       let res = await fetch(url, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'set-cookie': token,
           'token': token
         },
-        body: JSON.stringify(input)
+        body: newFormData
       })
 
       let data = await res.json();
@@ -65,9 +79,6 @@ export function CreateBlog() {
     if (event.target.name == 'title') {
       titleRef.current = event.target.value;
     }
-    if (event.target.name == 'image') {
-      imageRef.current = event.target.value;
-    }
     if (event.target.name == 'content') {
       contentRef.current = event.target.value;
     }
@@ -79,7 +90,9 @@ export function CreateBlog() {
   return (
     <div className="grid grid-rows-[2fr_5fr_10fr_1fr_1fr] h-full w-full ">
       <div className="border-b p-2 border-stroke"><textarea onChange={textareaHandler} name="title" placeholder="Title" className="resize-none h-full w-full p-2" minLength={8} maxLength={50} required spellCheck='true' ></textarea></div>
-      <div className="border-b border-stroke p-2 "><textarea onChange={textareaHandler} name="image" placeholder="Image" className="resize-none h-full w-full p-2" minLength={8} maxLength={50} required spellCheck='true' ></textarea></div>
+
+      <div className="border-b border-stroke p-2 "><UploadImage /></div>
+
       <div className="border-b border-stroke p-2 "><textarea onChange={textareaHandler} name="content" placeholder="Content" className="resize-none h-full w-full p-2" minLength={8} maxLength={10000} required spellCheck='true' ></textarea></div>
       <div className="border-b border-stroke flex ">
 

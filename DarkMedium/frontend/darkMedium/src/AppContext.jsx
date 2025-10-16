@@ -19,7 +19,8 @@ export default function AppContextProvider({ children }) {
     token: ''
   })
   const [deleted, setDeleted] = useState(false);
-  const value = { isLoggedIn, setLoggedIn, user, setUser, deleted, setDeleted }
+  const [formData, setFormData] = useState({})
+  const value = { isLoggedIn, setLoggedIn, user, setUser, deleted, setDeleted, formData, setFormData }
 
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

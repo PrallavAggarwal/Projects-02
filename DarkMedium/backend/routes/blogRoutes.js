@@ -13,24 +13,27 @@ const blogRoute = Router();
 const { blogModel, tagModel, userModel } = require('../db/models.js')
 const { z, success } = require('zod');
 const authmiddleware = require('../middlewares/auth.js')
+const upload = require('../utils/multer.js')
+const uploadOnCloudinary = require('../utils/cloudinary.js')
 
-blogRoute.post('/create', authmiddleware, async (req, res) => {
+blogRoute.post('/create', authmiddleware, upload.single('uploadImage'), async (req, res) => {
 
   try {
+    console.log('request recieved : ', req)
+    console.log('in create blog, req.body : ', req.body);
+    console.log('in create blog, req.file : ', req.file)
     let title = req.body.title;
     let content = req.body.content;
-    let imageUrl = req.body.imageUrl;
     let date = Date();
     let userId = req.userId;
-    let tag = req.body.tag;
+    let tag = JSON.parse(req.body.tag);
 
     //some checks 
     //must entries : {title, content, image, userid, tags}
     //checks : {not empty, string, min-max length}
-    if (!title || !content || !imageUrl || !userId || !tag) {
+    if (!title || !content || !userId || !tag) {
       if (!title) console.log("title missing.");
       if (!content) console.log("content missing.");
-      if (!imageUrl) console.log("imageUrl missing.");
       if (!tag) console.log("tag missing.");
       if (!userId) console.log("userId missing.")
 
@@ -49,14 +52,12 @@ blogRoute.post('/create', authmiddleware, async (req, res) => {
     const requiredBody = z.object({
       title: z.string().min(8).max(50),
       content: z.string().min(8).max(10000),
-      imageUrl: z.string().min(8).max(1000),
       //   tag: z.string().min(1).max(50)
     })
 
     const parsedBody = requiredBody.safeParse({
       title: title,
       content: content,
-      imageUrl: imageUrl,
       //     tag: tag
     })
     if (!parsedBody.success) {
@@ -71,6 +72,17 @@ blogRoute.post('/create', authmiddleware, async (req, res) => {
       })
     }
 
+    //uploading image
+    const imageUrl = await uploadOnCloudinary(req.file.path);
+    console.log('response url after uploading to cloudinary \n', imageUrl)
+    if (!imageUrl) {
+      return res.status(500).json({
+        response: imageUrl,
+        message: 'image not uploaded',
+        success: false
+      })
+    }
+
 
     //entry in database 
 
@@ -78,7 +90,7 @@ blogRoute.post('/create', authmiddleware, async (req, res) => {
     let blogEntry = await blogModel.create({
       title,
       content,
-      imageUrl,
+      imageUrl: imageUrl.secure_url,
       createdAt: date,
       author: userId,
       tags: tag
@@ -291,5 +303,35 @@ blogRoute.delete('/delete', async (req, res) => {
   }
 })
 
+
+blogRoute.post('/upload', upload.single('uploadImage'), async (req, res, next) => {
+  try {
+    let response = req.body;
+    console.log("upload route : ", response.title);
+    console.log("upload req : ", req.files, req.file);
+    const responseUrl = await uploadOnCloudinary(req.file.path);
+    if (!responseUrl) {
+      return res.status(500).json({
+        success: false,
+        message: 'file not uploaded',
+        response: responseUrl
+      })
+    }
+
+    console.log("responseUrl after uploading : ", responseUrl)
+
+
+    return res.json({
+      message: 'local upload success.',
+      response: responseUrl
+    })
+  } catch (error) {
+    console.log("error while uploading : ", error);
+    return res.json({
+      message: 'not uploaded .',
+      error: error
+    })
+  }
+})
 
 module.exports = blogRoute;

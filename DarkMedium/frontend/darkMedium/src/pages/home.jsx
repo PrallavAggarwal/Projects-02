@@ -21,10 +21,12 @@ export function Home() {
         isLoggedIn &&
         <div className="z-0">
           <Header />
-          <div className="grid md:grid-cols-[1fr_3fr_1fr] sm:grid-cols-[1fr_2fr] grid-cols-1 items-center justify-center h-[calc(100vh-57px)]">
+          <div className="grid md:grid-cols-[1fr_3fr_1fr] sm:grid-cols-[1fr_4fr] grid-cols-1 items-center justify-center h-[calc(100vh-57px)]">
             <Sidebar />
             <MainFrame />
-            <Tags />
+            <div className="hidden md:flex h-full w-full">
+              <Tags />
+            </div>
           </div>
         </div>
       }

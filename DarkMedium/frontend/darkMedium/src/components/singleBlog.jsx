@@ -42,7 +42,7 @@ export function SingleBlog({ setBlogs, title, profile, content, imageUrl, blogId
         </div>
         <div className="border-b border-stroke grid grid-rows-[80px_200px_3fr]">
           <div className="border-b border-stroke p-2 text-center capitalize flex justify-center items-center">{title}</div>
-          <div className="border-b border-stroke p-2 flex justify-center items-center"><iframe src={imageUrl}></iframe></div>
+          <div className="border-b border-stroke p-2 flex justify-center items-center"><img src={imageUrl}></img></div>
           <div className="p-2 text-justify">{content}</div>
         </div>
         <div className={`grid ${profile ? 'grid-cols-4' : 'grid-cols-3'}`}>
