@@ -32,6 +32,15 @@ A **full-stack blogging platform** inspired by Medium, featuring secure authenti
 
 ---
 
+## Screenshots 
+
+![images](./src/assets/Screenshot From 2025-10-29 14-49-06.png)
+![image2](./src/assets/Screenshot From 2025-10-29 14-49-28.png)
+![image3](./src/assets/Screenshot From 2025-10-29 14-49-40.png)
+![image4](./src/assets/Screenshot From 2025-10-29 14-51-35.png)
+
+---
+
 ## Project Structure
 
 ```
