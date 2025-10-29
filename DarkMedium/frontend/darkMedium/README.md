@@ -7,12 +7,14 @@ A **full-stack blogging platform** inspired by Medium, featuring secure authenti
 ## Table of Contents
 
 - [Features](#features)
+- [Screenshots](#Screenshots)
 - [Project Structure](#project-structure)
 - [Tech Stack & Libraries](#tech-stack--libraries)
 - [Getting Started](#getting-started)
   - [Backend Setup](#backend-setup)
   - [Frontend Setup](#frontend-setup)
 - [API Overview](#api-overview)
+- [Future](#FutureWork)
 - [Environment Variables](#environment-variables)
 - [Contributing](#contributing)
 - [License](#license)
@@ -34,10 +36,10 @@ A **full-stack blogging platform** inspired by Medium, featuring secure authenti
 
 ## Screenshots 
 
-![images](./src/assets/Screenshot From 2025-10-29 14-49-06.png)
-![image2](./src/assets/Screenshot From 2025-10-29 14-49-28.png)
-![image3](./src/assets/Screenshot From 2025-10-29 14-49-40.png)
-![image4](./src/assets/Screenshot From 2025-10-29 14-51-35.png)
+![images](https://github.com/PrallavAggarwal/Projects-02/blob/projects/DarkMedium/frontend/darkMedium/src/assets/Screenshot%20From%202025-10-29%2014-49-06.png)
+![image2](https://github.com/PrallavAggarwal/Projects-02/blob/projects/DarkMedium/frontend/darkMedium/src/assets/Screenshot%20From%202025-10-29%2014-49-28.png)
+![image3](https://github.com/PrallavAggarwal/Projects-02/blob/projects/DarkMedium/frontend/darkMedium/src/assets/Screenshot%20From%202025-10-29%2014-49-40.png)
+![image4](https://github.com/PrallavAggarwal/Projects-02/blob/projects/DarkMedium/frontend/darkMedium/src/assets/Screenshot%20From%202025-10-29%2014-51-35.png)
 
 ---
 
@@ -152,6 +154,16 @@ DarkMedium/
 - `POST /api/v1/blog/upload`: Upload image (Cloudinary)
 
 > **Note:** Most routes require JWT authentication in request headers.
+
+---
+
+## FutureWork
+
+- Adding recursive Response feature to each blog.
+- Adding Like feature with limit of one time one like.
+- Adding more Tags and custom Tags.
+- UI improvements.
+- UX improvements.
 
 ---
 
