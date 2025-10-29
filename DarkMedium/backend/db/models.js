@@ -34,6 +34,7 @@ const user = new Schema({
   blogs: [{ type: ObjectId, ref: 'blog' }],
   tags: [String],
   liked: [{ type: ObjectId, ref: 'blog' }],
+  avatarUrl: String,
 })
 
 const tag = new Schema({

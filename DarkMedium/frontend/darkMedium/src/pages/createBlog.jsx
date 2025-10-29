@@ -10,12 +10,27 @@ export function CreateBlog() {
   const imageRef = useRef('');
   const contentRef = useRef('');
 
+  const mouth = ['cute', 'faceMask', 'lilSmile', 'smileLol', 'smileTeeth', 'wideSmile', 'tongueOut'];
+  const eyes = ['closed', 'closed2', 'cute', 'glasses', 'pissed', 'plain', 'sad', 'shades', 'stars', 'wink', 'wink2'];
+  const background = ['059ff2', '71cf62', 'd84be5', 'd9915b', 'f6d594', 'fcbc34'];
+
+  let RandomMouth = mouth[Math.floor(Math.random() * mouth.length)]
+  let RandomEyes = mouth[Math.floor(Math.random() * eyes.length)]
+  let RandomBackground = mouth[Math.floor(Math.random() * background.length)]
+  let avatarUrl = `https://api.dicebear.com/9.x/fun-emoji/svg?eyes=${RandomEyes}&mouth=${RandomMouth}&backgroundColor=${RandomBackground}`
+
   const { user, formData, setFormData } = useContext(AppContext);
   const navigate = useNavigate()
 
   console.log('value of formData : ', formData);
   async function submitHandler() {
     try {
+      let RandomMouth = mouth[Math.floor(Math.random() * mouth.length)]
+      let RandomEyes = mouth[Math.floor(Math.random() * eyes.length)]
+      let RandomBackground = mouth[Math.floor(Math.random() * background.length)]
+      let avatarUrl = `https://api.dicebear.com/9.x/fun-emoji/svg?eyes=${RandomEyes}&mouth=${RandomMouth}&backgroundColor=${RandomBackground}`
+
+
       let tagArray = [];
       for (const key in tag) {
         if (tag[key]) {
@@ -31,6 +46,7 @@ export function CreateBlog() {
       newFormData.append('userId', user.id);
       newFormData.append('tag', JSON.stringify(tagArray));
       newFormData.append('uploadImage', formData);
+      newFormData.append('avatarUrl', avatarUrl)
       for (var pair of newFormData.entries()) {
         console.log(`${pair[0]}: ${pair[1]}`);
       }
@@ -88,12 +104,12 @@ export function CreateBlog() {
 
 
   return (
-    <div className="grid grid-rows-[2fr_5fr_10fr_1fr_1fr] h-full w-full ">
+    <div className="grid grid-rows-[2fr_5fr_10fr_1fr_1fr] h-auto bg-background w-full pb-2.5 ">
       <div className="border-b p-2 border-stroke"><textarea onChange={textareaHandler} name="title" placeholder="Title" className="resize-none h-full w-full p-2" minLength={8} maxLength={50} required spellCheck='true' ></textarea></div>
 
       <div className="border-b border-stroke p-2 "><UploadImage /></div>
 
-      <div className="border-b border-stroke p-2 "><textarea onChange={textareaHandler} name="content" placeholder="Content" className="resize-none h-full w-full p-2" minLength={8} maxLength={10000} required spellCheck='true' ></textarea></div>
+      <div className="border-b h-screen border-stroke p-2"><textarea onChange={textareaHandler} name="content" placeholder="Content" className="resize-none h-full w-full p-2" minLength={8} maxLength={10000} required spellCheck='true' ></textarea></div>
       <div className="border-b border-stroke flex ">
 
 
@@ -111,7 +127,7 @@ export function CreateBlog() {
       </div>
 
       <div className="border-b border-stroke grid grid-cols-2">
-        <div className="w-full h-full p-2 font-semibold flex justify-center items-center border-r border-stroke" onClick={submitHandler}>Submit</div>
+        <div className="w-full h-full p-2 cursor-pointer hover:bg-gray-100 hover:text-background transition-all ease-in-out font-semibold flex justify-center items-center border-r border-stroke" onClick={submitHandler}>Submit</div>
         <div className="w-full h-full p-2 font-semibold flex justify-center items-center">Preview</div>
       </div>
     </div>

@@ -27,7 +27,6 @@ blogRoute.post('/create', authmiddleware, upload.single('uploadImage'), async (r
     let date = Date();
     let userId = req.userId;
     let tag = JSON.parse(req.body.tag);
-
     //some checks 
     //must entries : {title, content, image, userid, tags}
     //checks : {not empty, string, min-max length}
@@ -93,7 +92,7 @@ blogRoute.post('/create', authmiddleware, upload.single('uploadImage'), async (r
       imageUrl: imageUrl.secure_url,
       createdAt: date,
       author: userId,
-      tags: tag
+      tags: tag,
     });
 
     console.log(":::::::::::::blog created:::::::::::::::::::\n", blogEntry);
@@ -204,7 +203,7 @@ blogRoute.get('/blogs', authmiddleware, async (req, res) => {
 
 blogRoute.get('/allBlogs', async (req, res) => {
   try {
-    let blogs = await blogModel.find({});
+    let blogs = await blogModel.find({}).populate('author');
     return res.status(200).json({
       blogs: blogs
     })

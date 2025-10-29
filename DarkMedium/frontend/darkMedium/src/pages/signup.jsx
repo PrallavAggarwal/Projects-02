@@ -60,7 +60,8 @@ export function SignUp() {
         favourites: data.user.favourites,
         liked: data.user.liked,
         tags: data.user.tags,
-        token: data.token
+        token: data.token,
+        avatarUrl: data.user.avatarUrl
       })
       navigate('/home')
       alert('signup success')

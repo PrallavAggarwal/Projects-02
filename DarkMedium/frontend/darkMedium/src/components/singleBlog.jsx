@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryOptionsFetchUserBlogs } from "../generalOptions/queries";
 
 
-export function SingleBlog({ setBlogs, title, profile, content, imageUrl, blogId }) {
+export function SingleBlog({ setBlogs, title, profile, content, imageUrl, blogId, username, avatarUrl }) {
 
   const { user } = useContext(AppContext)
   console.log('value of user in singleBlog : ', user)
@@ -37,12 +37,12 @@ export function SingleBlog({ setBlogs, title, profile, content, imageUrl, blogId
     <div className="font-FiraMono border-t border-b border-stroke h-1/2">
       <div className="grid grid-rows-[80px_6fr_80px] border-r border-stroke">
         <div className="border-b border-stroke grid grid-cols-[1fr_2fr] items-center justify-center">
-          <div className="border-r border-stroke h-full w-full flex items-center justify-center">pfp</div>
-          <div className="w-full h-full flex justify-center items-center ">Satoshi Nakamoto</div>
+          <div className="border-r border-stroke h-[80px] w-auto flex items-center justify-center"><img src={avatarUrl} className="h-full border object-cover" /></div>
+          <div className="w-full flex justify-center items-center ">{username ? username : `Satoshi Nakamoto`}</div>
         </div>
         <div className="border-b border-stroke grid grid-rows-[80px_200px_3fr]">
           <div className="border-b border-stroke p-2 text-center capitalize flex justify-center items-center">{title}</div>
-          <div className="border-b border-stroke p-2 flex justify-center items-center"><img src={imageUrl}></img></div>
+          <div className="border-b border-stroke p-2 flex justify-center items-center object-cover"><img src={imageUrl} className="h-full w-1/2"></img></div>
           <div className="p-2 text-justify">{content}</div>
         </div>
         <div className={`grid ${profile ? 'grid-cols-4' : 'grid-cols-3'}`}>

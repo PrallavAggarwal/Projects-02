@@ -10,6 +10,7 @@ export function Profile() {
   const { user } = useContext(AppContext)
   const token = user.token;
   console.log('token of user : ', token)
+  console.log('user from profile : ', user)
 
   const { data, isLoading, isSuccess, isError } = useQuery(queryOptionsFetchUserBlogs(token));
 
@@ -69,9 +70,11 @@ export function Profile() {
           let imageUrl = item.imageUrl;
           let content = item.content;
           let blogId = item._id;
+          {/* let username = item.author.username; */ }
+          {/* let avatarUrl = item.author.avatarUrl; */ }
           console.log('item ', item)
           return <div key={blogId}>
-            <SingleBlog blogId={blogId} profile={true} title={title} imageUrl={imageUrl} content={content} />
+            <SingleBlog blogId={blogId} username={user.username} avatarUrl={user.avatarUrl} profile={true} title={title} imageUrl={imageUrl} content={content} />
           </div>
         })
 

@@ -123,10 +123,23 @@ export async function signinHandler(email_password) {
 
 export async function signupHandler(input_data) {
   try {
+    const mouth = ['cute', 'faceMask', 'lilSmile', 'smileLol', 'smileTeeth', 'wideSmile', 'tongueOut'];
+    const eyes = ['closed', 'closed2', 'cute', 'glasses', 'pissed', 'plain', 'sad', 'shades', 'stars', 'wink', 'wink2'];
+    const background = ['059ff2', '71cf62', 'd84be5', 'd9915b', 'f6d594', 'fcbc34'];
+
+    let RandomMouth = mouth[Math.floor(Math.random() * mouth.length)]
+    let RandomEyes = eyes[Math.floor(Math.random() * eyes.length)]
+    let RandomBackground = background[Math.floor(Math.random() * background.length)]
+    let avatarUrl = `https://api.dicebear.com/9.x/fun-emoji/svg?eyes=${RandomEyes}&mouth=${RandomMouth}&backgroundColor=${RandomBackground}`
+    console.log('avatarUrl : ', avatarUrl)
+
+
+
     let input = {
       email: input_data.email,
       username: input_data.username,
-      password: input_data.password
+      password: input_data.password,
+      avatarUrl: avatarUrl
     }
     console.log(input)
     let url = 'http://localhost:3003/api/v1/user/signup';

@@ -31,7 +31,7 @@ export function MainFrame() {
       <div className="flex justify-center sm:justify-start w-full border-b border-stroke">
         <div className=" border-l-1 sm:border-l-0 pt-4 py-2 px-5 h-full border-r border-stroke">For You</div>
         <div className="pt-4 py-2 px-5 h-full border-r border-stroke">Explore</div>
-        <div onClick={createHandler} className="pt-4 py-2 px-5 h-full border-r border-stroke">Create</div>
+        <div onClick={createHandler} className="pt-4 py-2 px-5 h-full hover:inset-ring-2 cursor-pointer border-r border-stroke">Create</div>
       </div>
 
       <div className="flex flex-col gap-5">
@@ -46,9 +46,11 @@ export function MainFrame() {
             let imageUrl = item.imageUrl;
             let content = item.content;
             let blogId = item._id;
+            let username = item.author ? item.author.username : 'Satoshi Nakamoto';
+            let avatarUrl = item.author ? item.author.avatarUrl : '';
             console.log('item ', item)
             return <div key={blogId}>
-              <SingleBlog blogId={blogId} profile={false} title={title} imageUrl={imageUrl} content={content} />
+              <SingleBlog blogId={blogId} profile={false} title={title} avatarUrl={avatarUrl} username={username} imageUrl={imageUrl} content={content} />
             </div>
           })
 

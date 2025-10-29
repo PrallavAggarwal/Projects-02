@@ -16,7 +16,8 @@ export default function AppContextProvider({ children }) {
     liked: [],
     tags: [],
     id: '',
-    token: ''
+    token: '',
+    avatarUrl: ''
   })
   const [deleted, setDeleted] = useState(false);
   const [formData, setFormData] = useState({})

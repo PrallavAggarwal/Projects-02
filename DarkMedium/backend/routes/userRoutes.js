@@ -26,6 +26,7 @@ userRouter.post('/signup', async (req, res) => {
     let email = req.body.email;
     let username = req.body.username;
     let password = req.body.password;
+    let avatarUrl = req.body.avatarUrl;
 
     //apply checks on data using zod.
     //zod schema created.
@@ -70,7 +71,7 @@ userRouter.post('/signup', async (req, res) => {
     //before creating entry password must be encrypted. Using bcrypt.
     //hashed password must be stored in db.
     let hashPassword = await bcrypt.hash(password, 4)
-    user = await userModel.create({ email: email, username: username, password: hashPassword });
+    user = await userModel.create({ email: email, username: username, password: hashPassword, avatarUrl: avatarUrl });
     console.log("entry successfully created in database\n", user);
 
     //sending token to cookie.

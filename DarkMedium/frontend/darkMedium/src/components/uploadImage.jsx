@@ -76,15 +76,15 @@ export function UploadImage() {
 
 
   return (
-    <div className="h-full w-full border border-red-800 object-contain">
+    <div className="h-full w-full object-cover flex flex-col justify-center items-center p-5">
 
       <form id="form" encType="multipart/form-data" >
-        <input type="file" name="uploadImage" onChange={(e) => changeHandler(e)} className="border border-blue-600" />
+        <input type="file" name="uploadImage" onChange={(e) => changeHandler(e)} className="font-FiraMono cursor-pointer" placeholder="upload your image" />
       </form>
 
       {
         image.present &&
-        <img src={image.url} alt="preview of image" className="object-cover" />
+        <img src={image.url} alt="preview of image" className="w-1/2 h-full" />
       }
       {
         !image.present &&
